@@ -137,6 +137,20 @@ module wall_mount_with_screw_holes() {
     }
 }
 
+
+module 2d_lever() {
+  polygon([
+    [0, 0],
+    [0, lv_len],
+    [-30, lv_len],
+    [-30, lv_len-0.5],
+    [-30-lv_thk, lv_len-0.5],
+    [-30-lv_thk, lv_len+lv_thk],
+    [lv_thk, lv_len+lv_thk],
+    [lv_thk, 0]
+  ]); 
+}
+
 // Lever
 module lever () {
     lv_axis_len = gp_width + 2*parts_sep + 2*lv_thk;
@@ -147,7 +161,7 @@ module lever () {
     linear_extrude(lv_axis_len)
     translate([lv_axis_z, lv_axis_x])
     circle (d=lv_axis_diam);
-
+/*
     translate([gp_width + parts_sep - gp_side_thk, lv_axis_x, lv_axis_z - (lv_axis_diam/2)])
     rotate([0, -90, 180])
     linear_extrude(lv_thk)
@@ -157,8 +171,13 @@ module lever () {
     rotate([0, -90, 180])
     linear_extrude(lv_thk)
     square ([lv_axis_diam, lv_len]);
+  */
   
-  
+  translate([0, 0, lv_thk])
+  translate([gp_width + parts_sep, lv_axis_x, lv_axis_z - (lv_axis_diam/2)])
+  rotate([0, 90, 180])
+  linear_extrude(lv_thk)
+  2d_lever();
 }
 
 union () {
