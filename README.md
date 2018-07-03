@@ -3,3 +3,7 @@
 
 An attempt to build a parametric secure latch using openscad.
 This is work in progress, I'll update the README when I get a fonctionnal printed latch.
+
+### Dependencies
+
+You'll need the MCAD librarie (https://github.com/openscad/MCAD)
