@@ -8,6 +8,7 @@
 */
 use <MCAD/2Dshapes.scad>;
 
+$fs=0.05;
 hole_axis_sep = 1;
 parts_sep = 0.5;
 
@@ -45,18 +46,20 @@ lv_axis_diam = 3;
 lv_axis_z = 7;
 lv_axis_x = 16;
 
+lv_len = 50;
+
 
 module 2d_side_plate (lb, lt, h, bp_thickness, r=4) {
     difference() {
         hull() {
-            translate ([r,   r])    circle (r, $fs=0.1);
-            translate ([h-r, r])    circle (r, $fs=0.1);
-            translate ([h-r, lt-r]) circle (r, $fs=0.1);
+            translate ([r,   r])    circle (r);
+            translate ([h-r, r])    circle (r);
+            translate ([h-r, lt-r]) circle (r);
             translate ([bp_thickness/2,   lb-bp_thickness]) circle (d=bp_thickness);
         }
 
         // Hole for the lever axis
-        translate([lv_axis_z, lv_axis_x]) circle (d=lv_axis_diam+hole_axis_sep, $fs=0.1);
+        translate([lv_axis_z, lv_axis_x]) circle (d=lv_axis_diam+hole_axis_sep);
     }
 }
 
@@ -75,13 +78,13 @@ module grip () {
     // bottom plate
     linear_extrude (gp_thk)
     translate([gp_width/2-gp_side_thk, gp_plate_len])
-    roundedSquare([gp_width, gp_plate_len], r=gp_round, $fs=0.1);
+    roundedSquare([gp_width, gp_plate_len], r=gp_round);
 
     // Axis for the wall mount
     translate([gp_width-gp_side_thk, wm_axis_z, wm_axis_z])
     rotate([0,-90,0])
     linear_extrude(gp_width)
-    circle (d=wm_axis_diam, $fs=0.05);
+    circle (d=wm_axis_diam);
 }
 
 // Wall mount
@@ -107,11 +110,11 @@ module wall_mount () {
                 square([wm_axis_holder_size/2 + wm_thk, wm_axis_holder_size], center=true);
                 
                 // Part around the wall mount axis
-                circle(d=wm_axis_holder_size, $fs=0.05);
+                circle(d=wm_axis_holder_size);
             }
             
             // Hole for the grip axis
-            circle(d=wm_hole_size, $fs=0.05);
+            circle(d=wm_hole_size);
         }
 
         square([wm_thk, wm_len]);
@@ -127,10 +130,10 @@ module wall_mount_with_screw_holes() {
         screw2_z = wm_axis_holder_size + screw_offset;
 
         // Screw holes
-        translate([screw_x, 0, 15]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d, $fs=0.05);
-        translate([screw_x, 0, 15]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d, $fs=0.05);
-        translate([screw_x, 0, 30]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d, $fs=0.05);
-        translate([screw_x, 0, 30]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d, $fs=0.05);
+        translate([screw_x, 0, 15]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d);
+        translate([screw_x, 0, 15]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d);
+        translate([screw_x, 0, 30]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d);
+        translate([screw_x, 0, 30]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d);
     }
 }
 
@@ -143,17 +146,18 @@ module lever () {
     rotate([0, -90, 0])
     linear_extrude(lv_axis_len)
     translate([lv_axis_z, lv_axis_x])
-    circle (d=lv_axis_diam, $fs=0.05);
+    circle (d=lv_axis_diam);
 
     translate([gp_width + parts_sep - gp_side_thk, lv_axis_x, lv_axis_z - (lv_axis_diam/2)])
     rotate([0, -90, 180])
     linear_extrude(lv_thk)
-    square ([lv_axis_diam, 50]);
+    square ([lv_axis_diam, lv_len]);
   
     translate([-(parts_sep + lv_thk + gp_side_thk), lv_axis_x, lv_axis_z - (lv_axis_diam/2)])
     rotate([0, -90, 180])
     linear_extrude(lv_thk)
-    square ([lv_axis_diam, 50]);
+    square ([lv_axis_diam, lv_len]);
+  
   
 }
 
