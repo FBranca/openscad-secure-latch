@@ -43,6 +43,7 @@ screw_offset = 10;
 lv_thk = 3;
 lv_axis_diam = 3;
 lv_axis_z = 7;
+lv_axis_x = 16;
 
 
 module 2d_side_plate (lb, lt, h, bp_thickness, r=4) {
@@ -55,7 +56,7 @@ module 2d_side_plate (lb, lt, h, bp_thickness, r=4) {
         }
 
         // Hole for the lever axis
-        translate([lv_axis_z, 16]) circle (d=lv_axis_diam+hole_axis_sep, $fs=0.1);
+        translate([lv_axis_z, lv_axis_x]) circle (d=lv_axis_diam+hole_axis_sep, $fs=0.1);
     }
 }
 
@@ -66,19 +67,21 @@ module grip () {
     2d_side_plate (gp_side_upper_len, gp_side_lower_len, gp_side_height, gp_thk, 4);
 
     // Second side plate
-    translate([-(gp_width-gp_side_thk),0,0])
+    translate([gp_width-gp_side_thk, 0, 0])
     rotate([0,-90,0])
     linear_extrude(gp_side_thk)
     2d_side_plate (gp_side_upper_len, gp_side_lower_len, gp_side_height, gp_thk, 4);
 
     // bottom plate
     linear_extrude (gp_thk)
-    translate([-gp_width/2,gp_plate_len]) roundedSquare([gp_width, gp_plate_len], r=gp_round, $fs=0.1);
+    translate([gp_width/2-gp_side_thk, gp_plate_len])
+    roundedSquare([gp_width, gp_plate_len], r=gp_round, $fs=0.1);
 
     // Axis for the wall mount
+    translate([gp_width-gp_side_thk, wm_axis_z, wm_axis_z])
     rotate([0,-90,0])
     linear_extrude(gp_width)
-    translate([wm_axis_z, wm_axis_z]) circle (d=wm_axis_diam, $fs=0.05);
+    circle (d=wm_axis_diam, $fs=0.05);
 }
 
 // Wall mount
@@ -92,7 +95,7 @@ module wall_mount () {
     spacebtw_wm_gp = (gp_width - (gp_side_thk * 2) - wm_width) / 2;
     echo ("wall mount", spacebtw_wm_gp=spacebtw_wm_gp);
     
-    translate([-(gp_side_thk+spacebtw_wm_gp), 0])
+    translate([wm_width+spacebtw_wm_gp, 0])
     rotate([90,0,-90])
     linear_extrude(wm_width)
     union() {
@@ -118,15 +121,16 @@ module wall_mount () {
 module wall_mount_with_screw_holes() {
     difference() {
         wall_mount();
-
+        spacebtw_wm_gp = (gp_width - (gp_side_thk * 2) - wm_width) / 2;
+        screw_x  = wm_width/2 + spacebtw_wm_gp;
         screw1_z = wm_len - screw_offset;
-        screw1_z = wm_axis_holder_size + screw_offset;
+        screw2_z = wm_axis_holder_size + screw_offset;
 
         // Screw holes
-        translate([-gp_width/2,0,15]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d, $fs=0.05);
-        translate([-gp_width/2,0,15]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d, $fs=0.05);
-        translate([-gp_width/2,0,30]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d, $fs=0.05);
-        translate([-gp_width/2,0,30]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d, $fs=0.05);
+        translate([screw_x, 0, 15]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d, $fs=0.05);
+        translate([screw_x, 0, 15]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d, $fs=0.05);
+        translate([screw_x, 0, 30]) rotate([90,0,0]) linear_extrude(wm_thk) circle (d=screw_hole_d, $fs=0.05);
+        translate([screw_x, 0, 30]) rotate([90,0,0]) linear_extrude(screw_head_h) circle (d=screw_head_d, $fs=0.05);
     }
 }
 
@@ -135,13 +139,22 @@ module lever () {
     lv_axis_len = gp_width + 2*parts_sep + 2*lv_thk;
   
     // Lever axis
-    translate([lv_thk+parts_sep, 0, 0])
+    translate([gp_width + parts_sep, 0, 0])
     rotate([0, -90, 0])
     linear_extrude(lv_axis_len)
-    translate([lv_axis_z, 16]) circle (d=lv_axis_diam, $fs=0.05);
+    translate([lv_axis_z, lv_axis_x])
+    circle (d=lv_axis_diam, $fs=0.05);
 
-    translate([parts_sep,16,5.5]) rotate([0,-90,180]) linear_extrude(lv_thk) square ([lv_axis_diam, 50]);
-    translate([-(gp_width+parts_sep+lv_thk),16,5.5]) rotate([0,-90,180]) linear_extrude(lv_thk) square ([lv_axis_diam, 50]);
+    translate([gp_width + parts_sep - gp_side_thk, lv_axis_x, lv_axis_z - (lv_axis_diam/2)])
+    rotate([0, -90, 180])
+    linear_extrude(lv_thk)
+    square ([lv_axis_diam, 50]);
+  
+    translate([-(parts_sep + lv_thk + gp_side_thk), lv_axis_x, lv_axis_z - (lv_axis_diam/2)])
+    rotate([0, -90, 180])
+    linear_extrude(lv_thk)
+    square ([lv_axis_diam, 50]);
+  
 }
 
 union () {
